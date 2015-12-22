@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="true" scan="true" scanPeriod="1 minutes">
+
+	<!--~~~~~~~~~~ APPENDERS ~~~~~~~~~~ -->
+	<appender name="STDOUT_INFO" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{"dd.MM.yyyy HH:mm:ss z", EET} %-5level %logger{0}: %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STDOUT_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{"dd.MM.yyyy HH:mm:ss z", EET} %-5level %logger{0}: %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.err</target>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+		<encoder>
+			<pattern>%d{"dd.MM.yyyy HH:mm:ss z", EET} %-5level %logger{0}: %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!--~~~~~~~~~~ LOGGERS ~~~~~~~~~~ -->
+
+	<root level="info">
+		<appender-ref ref="STDOUT_INFO" />
+		<appender-ref ref="STDOUT_DEBUG" />
+		<appender-ref ref="STDERR" />
+	</root>
+
+	<logger name="com.devoler.ai3.server" level="debug">
+	</logger>
+
+
+</configuration>
