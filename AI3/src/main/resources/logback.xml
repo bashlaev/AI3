@@ -46,5 +46,7 @@
 	<logger name="com.devoler.ai3.server" level="debug">
 	</logger>
 
-
+	<logger name="com.devoler.ai3.model" level="debug">
+	</logger>
+	
 </configuration>
