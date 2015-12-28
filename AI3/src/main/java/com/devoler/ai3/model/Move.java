@@ -71,7 +71,9 @@ public abstract class Move {
 			} else {
 				player2 = curPlayer;
 			}
-			return new GameField(gameField.getWidth(), gameField.getHeight(), player1, player2, gameField.getCrystals(), gameField.getBase1(), gameField.getBase2(), gameField.isPlayer1Turn());
+			GameField result = new GameField(gameField.getWidth(), gameField.getHeight(), player1, player2, gameField.getCrystals(), gameField.getBase1(), gameField.getBase2(), gameField.isPlayer1Turn()); 
+			//			System.out.println(this + " " + gameField + " -> " + result);
+			return result;
 		}
 		
 		@Override

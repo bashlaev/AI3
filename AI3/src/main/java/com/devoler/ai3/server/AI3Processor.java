@@ -1,15 +1,14 @@
 package com.devoler.ai3.server;
 
-import java.util.Random;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.devoler.ai3.model.FeatureBasedEvaluator;
 import com.devoler.ai3.model.Game;
 import com.devoler.ai3.model.GameField;
 import com.devoler.ai3.model.Move;
 import com.devoler.ai3.model.Stats;
-import com.devoler.ai3.model.StubEvaluator;
+import com.devoler.minimax.MinimaxSolver;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,18 +26,25 @@ public final class AI3Processor implements JSONProcessor {
 			return new JsonObject();
 		}
 		if (state.equalsIgnoreCase("BATTLE")) {
+			long startTime = System.currentTimeMillis();
 			GameField gameField = GameField.fromJson(input.getAsJsonObject("gameField"), input.get("yourID").getAsInt());
 			logger.info("Battle request, field: {}", gameField);
-			Game game = new Game(new StubEvaluator(), gameField);
+			Game game = new Game(new FeatureBasedEvaluator(1000, 100, -100), gameField);
 			int numberOfMoves = game.getNumberOfMoves();
 			logger.info("Moves: {}", numberOfMoves);
-			int selectedMove = new Random().nextInt(numberOfMoves);
-			logger.info("Move selected: {}", selectedMove);
+			for(int i = 0; i < numberOfMoves; i++) {
+				logger.info("\tMove #{}: {} -> {}", i, game.getMove(i), ((Game) game.applyMove(i)).getGameField());
+			}
+			int selectedMove = MinimaxSolver.solveAB(game, 5);
+			// int selectedMove = new Random().nextInt(numberOfMoves);
+			logger.info("Selected move #{}: {}", selectedMove, game.getMove(selectedMove));
 			JsonArray response = new JsonArray();
 			for(Move move: game.getMove(selectedMove)) {
-				logger.info("Single move added: {}", move.toJson());
 				response.add(move.toJson());
 			}
+			long endTime = System.currentTimeMillis();
+			
+			logger.info("Processed in {} ms", endTime - startTime);
 			return response;
 		}
 		return null;
