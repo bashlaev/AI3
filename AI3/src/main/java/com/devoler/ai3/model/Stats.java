@@ -72,6 +72,20 @@ public final class Stats {
 		return sparePoints;
 	}
 	
+	public StatUpgrade upgrade(Stats oppStats) {
+		if ((health == 1) && (agility == 1) && (attack == 1)) {
+			return StatUpgrades.AGILITY;
+		}
+		// copy the other player
+		if (oppStats.getAttack() > attack) {
+			return StatUpgrades.ATTACK;
+		}
+		if (oppStats.getHealth() > health) {
+			return StatUpgrades.HEALTH;
+		}
+		return StatUpgrades.AGILITY;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("stats(h: %d, ag: %d, at: %d, pts: %d)", health, agility, attack, sparePoints);

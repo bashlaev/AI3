@@ -7,6 +7,7 @@ import com.devoler.ai3.model.FeatureBasedEvaluator;
 import com.devoler.ai3.model.Game;
 import com.devoler.ai3.model.GameField;
 import com.devoler.ai3.model.Move;
+import com.devoler.ai3.model.StatUpgrade;
 import com.devoler.ai3.model.Stats;
 import com.devoler.minimax.MinimaxSolver;
 import com.google.gson.JsonArray;
@@ -22,8 +23,10 @@ public final class AI3Processor implements JSONProcessor {
 		if (state.equalsIgnoreCase("CHOOSING_STATS")) {
 			Stats stats1 = Stats.fromJson(input.getAsJsonObject("playerStats").get("1").getAsJsonObject());
 			Stats stats2 = Stats.fromJson(input.getAsJsonObject("playerStats").get("2").getAsJsonObject());
-			logger.info("Choosing stats request, 1: {}, 2: {}", stats1, stats2);
-			return new JsonObject();
+			int myId = input.get("yourID").getAsInt();
+			StatUpgrade statUpgrade = (myId == 1) ? stats1.upgrade(stats2): stats2.upgrade(stats1); 
+			logger.info("Choosing stats request, 1: {}, 2: {}, upgrade: {}", stats1, stats2, statUpgrade);
+			return statUpgrade.toJson();
 		}
 		if (state.equalsIgnoreCase("BATTLE")) {
 			long startTime = System.currentTimeMillis();
@@ -35,7 +38,7 @@ public final class AI3Processor implements JSONProcessor {
 			for(int i = 0; i < numberOfMoves; i++) {
 				logger.info("\tMove #{}: {} -> {}", i, game.getMove(i), ((Game) game.applyMove(i)).getGameField());
 			}
-			int selectedMove = MinimaxSolver.solveAB(game, 5);
+			int selectedMove = MinimaxSolver.solveAB(game, 4);
 			// int selectedMove = new Random().nextInt(numberOfMoves);
 			logger.info("Selected move #{}: {}", selectedMove, game.getMove(selectedMove));
 			JsonArray response = new JsonArray();

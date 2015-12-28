@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.devoler.ai3.model.Move.Direction;
+import com.devoler.minimax.MinimaxSolver;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -170,7 +171,8 @@ public final class GameField {
 		if (player2.getHealth() <= 0) {
 			return Boolean.TRUE;
 		}
-		int totalCrystals = player1.getCrystalsCollected() + player2.getCrystalsCollected() + crystals.size();
+		int totalCrystals = player1.getCrystalsCollected() + player1.getCrystalsCarried()
+				+ player2.getCrystalsCollected() + player2.getCrystalsCarried() + crystals.size();
 		int crystalsToWin = totalCrystals / 2 + 1;
 		if (player1.getCrystalsCollected() >= crystalsToWin) {
 			return Boolean.TRUE;
@@ -179,6 +181,25 @@ public final class GameField {
 			return Boolean.FALSE;
 		}
 		return null;
+	}
+	
+	public boolean getPassiveWinner() {
+		if (player1.getCrystalsCollected() > player2.getCrystalsCollected()) {
+			return true;
+		} else if (player1.getCrystalsCollected() < player2.getCrystalsCollected()) {
+			return false;
+		} 
+		if (player1.getCrystalsCarried() > player2.getCrystalsCarried()) {
+			return true;
+		} else if (player1.getCrystalsCarried() < player2.getCrystalsCarried()) {
+			return false;
+		}
+		if (player1.getHealth() > player2.getHealth()) {
+			return true;
+		} else if (player1.getHealth() < player2.getHealth()) {
+			return false;
+		}
+		return false;
 	}
 	
 	public static GameField getStartPosition() {
@@ -195,6 +216,7 @@ public final class GameField {
 	public static void main(String[] args) {
 		GameField field = GameField.getStartPosition();
 		System.out.println(field);
-		Game game = new Game(new FeatureBasedEvaluator(1000, 100, -100), field); 
+		Game game = new Game(new FeatureBasedEvaluator(1000, 100, -100), field);
+		MinimaxSolver.solveAB(game, 4);
 	}
 }
