@@ -17,7 +17,7 @@ public interface MinimaxGame {
 	 * 
 	 * @return the game's evaluation for the current player.
 	 */
-	public long evaluate();
+	public long evaluate(boolean maximizingPlayer);
 	
 	/**
 	 * Returns the number of currently available moves.

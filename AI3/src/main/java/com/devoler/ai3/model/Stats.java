@@ -16,7 +16,7 @@ public final class Stats {
 	
 	private final int hashCode;
 	
-	Stats(final int health, final int agility, final int attack, final int sparePoints) {
+	public Stats(final int health, final int agility, final int attack, final int sparePoints) {
 		this.health = health;
 		this.agility = agility;
 		this.attack = attack;
@@ -53,6 +53,31 @@ public final class Stats {
 		return false;
 	}
 	
+	public boolean ge(Stats that) {
+		return (this.health >= that.health) && (this.attack >= that.attack) && (this.agility >= that.agility);
+	}
+	
+	public boolean canMakeAgility7() {
+		int neededPoints = 0;
+		int ag = agility;
+		while(ag < 7) {
+			ag++;
+			neededPoints += ag;
+		}
+		return sparePoints >= neededPoints;
+	}
+	
+	public boolean canMakeAgility8() {
+		int neededPoints = 0;
+		int ag = agility;
+		while(ag < 8) {
+			ag++;
+			neededPoints += ag;
+		}
+		return sparePoints >= neededPoints;
+	}
+
+	
 	@Override
 	public int hashCode() {
 		return hashCode;
@@ -83,6 +108,17 @@ public final class Stats {
 			return StatUpgrades.ATTACK;
 		}
 		if (oppStats.getHealth() > health) {
+			return StatUpgrades.HEALTH;
+		}
+		return StatUpgrades.AGILITY;
+	}
+	
+	public StatUpgrade upgradeToTarget(Stats targetStats) {
+		// copy the other player
+		if (targetStats.getAttack() > attack) {
+			return StatUpgrades.ATTACK;
+		}
+		if (targetStats.getHealth() > health) {
 			return StatUpgrades.HEALTH;
 		}
 		return StatUpgrades.AGILITY;

@@ -26,7 +26,7 @@ public class Game implements MinimaxGame {
 
 	private final void addMoves(GameField field, List<Move> currentPath) {
 		Move lastMove = currentPath.isEmpty() ? null : currentPath.get(currentPath.size() - 1);
-		List<Move> movesFromHere = field.getViableMoves(lastMove);
+		List<Move> movesFromHere = field.getViableMoves(lastMove, evaluator.isGatheringMode(field, true));
 		if (movesFromHere.isEmpty()) {
 			addMove(currentPath, field);
 			return;
@@ -54,8 +54,8 @@ public class Game implements MinimaxGame {
 	}
 
 	@Override
-	public long evaluate() {
-		return evaluator.evaluate(gameField);
+	public long evaluate(boolean maximizingPlayer) {
+		return evaluator.evaluate(gameField, maximizingPlayer);
 	}
 
 	@Override

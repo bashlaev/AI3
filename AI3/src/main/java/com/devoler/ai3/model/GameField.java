@@ -83,7 +83,7 @@ public final class GameField {
 		final Player player2 = (playerAt1.getId() == 1) ? playerAt2 : playerAt1;
 		JsonArray bases = json.getAsJsonArray("bases");
 		JsonObject base1Obj = bases.get(0).getAsJsonObject();
-		JsonObject base2Obj = bases.get(0).getAsJsonObject();
+		JsonObject base2Obj = bases.get(1).getAsJsonObject();
 		Position base1ObjPos = Position.fromJson(base1Obj.getAsJsonObject("position"));
 		Position base2ObjPos = Position.fromJson(base2Obj.getAsJsonObject("position"));
 		int base1Id = base1Obj.get("id").getAsInt();
@@ -99,28 +99,63 @@ public final class GameField {
 		boolean player1Turn = (myId == 1);
 		return new GameField(width, height, player1, player2, crystals, base1, base2, player1Turn);
 	}
+	
+	public boolean isGatheringMode(boolean maxPlayer) {
+		// enter defense when more crystals and health not at max
+		boolean player1Turn = isPlayer1Turn();
+		if (!maxPlayer) {
+			player1Turn = !player1Turn;
+		}
+		Player player1 = getPlayer1();
+		Player player2 = getPlayer2();
+		Player curPlayer = player1Turn ? player1 : player2;
+		Player oppPlayer = player1Turn ? player2 : player1;
 
-	public List<Move> getViableMoves(Move lastMove) {
+		int curScore = curPlayer.getCrystalsCarried() + curPlayer.getCrystalsCollected();
+		int oppScore = oppPlayer.getCrystalsCarried() + oppPlayer.getCrystalsCollected();
+		
+		boolean defensiveMode = (curScore > oppScore) && (curPlayer.getHealth() < curPlayer.getStats().getHealth() * Stats.HEALTH_POINTS);
+//		if (player1Turn != iAmPlayer1) {
+//			return true;
+////			System.out.println("field " + this + "cur: " + curScore + ", opp: " + oppScore + ", hl: " + curPlayer.getHealth() + " of " + curPlayer.getStats().getHealth() * Stats.HEALTH_POINTS + ", defensive mode: " + defensiveMode);
+//		}
+		return !defensiveMode;
+	}
+
+	public List<Move> getViableMoves(Move lastMove, boolean gatheringMode) {
 		Player curPlayer = isPlayer1Turn() ? player1 : player2;
 		Player oppPlayer = isPlayer1Turn() ? player2 : player1;
+		Position curBase = isPlayer1Turn() ? base1 : base2;
 		if (curPlayer.getMovesLeft() == 0) {
 			return NO_MOVES;
 		}
-		if (lastMove == Move.NO_OP) {
-			return NO_OP;
+		if (!gatheringMode) {
+			if (lastMove == Move.NO_OP) {
+				return NO_OP;
+			}
 		}
 		List<Move> moves = new ArrayList<>();
 		// add attack move
-		if (curPlayer.getPosition().getManhattanDistance(oppPlayer.getPosition()) <= 2) {
-			moves.add(Move.ATTACK);
+		if (!gatheringMode) {
+			if (curPlayer.getPosition().getManhattanDistance(oppPlayer.getPosition()) <= 2) {
+				moves.add(Move.ATTACK);
+			}
+			if (curPlayer.getPosition().equals(curBase)) {
+				return moves;
+			}
 		}
+		
 		// add collect move
-		if (crystals.contains(curPlayer.getPosition())) {
+		if ((gatheringMode) && (crystals.contains(curPlayer.getPosition()))) {
 			moves.add(Move.COLLECT);
+			if (gatheringMode) {
+				return moves;
+			}
 		}
 		// add movement moves
 		int x = curPlayer.getPosition().getX();
 		int y = curPlayer.getPosition().getY();
+		// TODO remove stupid moves!
 		if ((x > 0) && (!curPlayer.getPosition().move(Direction.LEFT, width, height).equals(oppPlayer.getPosition()))) {
 			moves.add(Move.MOVE_LEFT);
 		}
@@ -204,9 +239,7 @@ public final class GameField {
 		List<Position> crystals = new ArrayList<>();
 		crystals.add(new Position(width / 2, height / 2));
 		Random random = new Random();
-		int minCrystals = 3;
-		int maxCrystals = 5;
-		int crystalsToGenerate = random.nextInt(maxCrystals - minCrystals) + minCrystals;
+		int crystalsToGenerate = 3;
 		while (true) {
 			Position p = new Position(random.nextInt(width / 2), random.nextInt(height / 2));
 			if (crystals.contains(p)) {
@@ -233,7 +266,7 @@ public final class GameField {
 	
 	@Override
 	public String toString() {
-		return String.format("GameField %dx%d, player1: %s, player2: %s, crystals: %s", width, height, player1, player2, crystals);
+		return String.format("GameField %dx%d, player1: %s, player2: %s, crystals: %s, player1 turn: %s", width, height, player1, player2, crystals, Boolean.toString(player1Turn));
 	}
 	
 	public static void main(String[] args) {

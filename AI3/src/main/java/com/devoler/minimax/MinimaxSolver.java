@@ -26,7 +26,7 @@ public final class MinimaxSolver {
 
 	private static long evaluateFor(MinimaxGame game, boolean maximizingPlayer) {
 		long time = System.nanoTime();
-		long result = maximizingPlayer ? game.evaluate() : -game.evaluate();
+		long result = game.evaluate(maximizingPlayer);
 		timeEvaluating += (System.nanoTime() - time);
 		return result;
 	}
