@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
@@ -37,7 +38,7 @@ public class JSONServer {
 				try {
 					JsonObject inJson = new JsonParser().parse(in).getAsJsonObject();
 					logger.info("Parsed: \"{}\"", inJson);
-					JsonObject outJson = processor.process(inJson);
+					JsonElement outJson = processor.process(inJson);
 					logger.info("Processed: \"{}\"", outJson);
 					byte[] outContent = outJson.toString().getBytes();
 
@@ -62,7 +63,7 @@ public class JSONServer {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new JSONServer(new EchoProcessor());
+		new JSONServer(new AI3Processor());
 	}
 
 }
