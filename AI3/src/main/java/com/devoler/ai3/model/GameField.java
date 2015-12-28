@@ -156,18 +156,22 @@ public final class GameField {
 		int x = curPlayer.getPosition().getX();
 		int y = curPlayer.getPosition().getY();
 		// TODO remove stupid moves!
-		if ((x > 0) && (!curPlayer.getPosition().move(Direction.LEFT, width, height).equals(oppPlayer.getPosition()))) {
+		boolean leftAvailable = (x > 0) && (!curPlayer.getPosition().move(Direction.LEFT, width, height).equals(oppPlayer.getPosition())) && (lastMove != Move.MOVE_RIGHT); 
+		if (leftAvailable) {
 			moves.add(Move.MOVE_LEFT);
 		}
-		if ((y > 0) && (!curPlayer.getPosition().move(Direction.UP, width, height).equals(oppPlayer.getPosition()))) {
+		boolean upAvailable = (y > 0) && (!curPlayer.getPosition().move(Direction.UP, width, height).equals(oppPlayer.getPosition())) && (lastMove != Move.MOVE_DOWN); 
+		if (upAvailable) {
 			moves.add(Move.MOVE_UP);
 		}
-		if ((x < width - 1)
-				&& (!curPlayer.getPosition().move(Direction.RIGHT, width, height).equals(oppPlayer.getPosition()))) {
+		boolean rightAvailable = (x < width - 1)
+				&& (!curPlayer.getPosition().move(Direction.RIGHT, width, height).equals(oppPlayer.getPosition())) && (lastMove != Move.MOVE_LEFT); 
+		if (rightAvailable) {
 			moves.add(Move.MOVE_RIGHT);
 		}
-		if ((y < height - 1)
-				&& (!curPlayer.getPosition().move(Direction.DOWN, width, height).equals(oppPlayer.getPosition()))) {
+		boolean downAvailable = (y < height - 1)
+				&& (!curPlayer.getPosition().move(Direction.DOWN, width, height).equals(oppPlayer.getPosition())) && (lastMove != Move.MOVE_UP); 
+		if (downAvailable) {
 			moves.add(Move.MOVE_DOWN);
 		}
 		// add NO_OP move
