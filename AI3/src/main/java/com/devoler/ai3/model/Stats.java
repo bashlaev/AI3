@@ -1,5 +1,7 @@
 package com.devoler.ai3.model;
 
+import java.util.Random;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.gson.JsonObject;
@@ -84,6 +86,34 @@ public final class Stats {
 			return StatUpgrades.HEALTH;
 		}
 		return StatUpgrades.AGILITY;
+	}
+	
+	public static Stats getRandomStats() {
+		Stats result = new Stats(1, 1, 1, 35);
+		Random random = new Random();
+		while(true) {
+			if ((result.sparePoints <= result.health) && (result.sparePoints <= result.attack) && (result.sparePoints <= result.agility)) {
+				return result;
+			}
+			StatUpgrades upgrade = StatUpgrades.values()[random.nextInt(StatUpgrades.values().length)]; 
+			switch(upgrade) {
+			case AGILITY:
+				if (result.sparePoints  > result.agility) {
+					result = new Stats(result.health, result.agility + 1, result.attack, result.sparePoints - result.agility - 1);
+				}
+				break;
+			case ATTACK:
+				if (result.sparePoints  > result.attack) {
+					result = new Stats(result.health, result.agility, result.attack + 1, result.sparePoints - result.attack - 1);
+				}
+				break;
+			case HEALTH:
+				if (result.sparePoints  > result.health) {
+					result = new Stats(result.health + 1, result.agility, result.attack, result.sparePoints - result.health - 1);
+				}
+				break;
+			}
+		}
 	}
 	
 	@Override

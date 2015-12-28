@@ -3,15 +3,13 @@ package com.devoler.ai3.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.devoler.ai3.model.Move.Direction;
-import com.devoler.minimax.MinimaxSolver;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public final class GameField {
 	private static final List<Move> NO_MOVES = new ArrayList<>();
@@ -202,21 +200,46 @@ public final class GameField {
 		return false;
 	}
 	
-	public static GameField getStartPosition() {
-		String startJson = "{\"width\":9,\"height\":11,\"players\":[{\"stats\":{\"health\":5,\"agility\":4,\"attack\":4,\"statsPoints\":3},\"healthPoints\":75,\"actionsPoints\":4,\"gatheredCrystals\":0,\"crystalsCount\":0,\"id\":1,\"position\":{\"x\":0,\"y\":0}},{\"stats\":{\"health\":5,\"agility\":4,\"attack\":4,\"statsPoints\":3},\"healthPoints\":75,\"actionsPoints\":0,\"gatheredCrystals\":0,\"crystalsCount\":0,\"id\":2,\"position\":{\"x\":8,\"y\":10}}],\"bases\":[{\"id\":1,\"position\":{\"x\":0,\"y\":0}},{\"id\":2,\"position\":{\"x\":8,\"y\":10}}],\"crystals\":[{\"id\":6,\"position\":{\"x\":4,\"y\":5}},{\"id\":0,\"position\":{\"x\":8,\"y\":0}},{\"id\":1,\"position\":{\"x\":0,\"y\":10}},{\"id\":2,\"position\":{\"x\":3,\"y\":4}},{\"id\":3,\"position\":{\"x\":5,\"y\":6}},{\"id\":4,\"position\":{\"x\":6,\"y\":1}},{\"id\":5,\"position\":{\"x\":2,\"y\":9}}]}";
-		JsonElement json = new JsonParser().parse(startJson);
-		return GameField.fromJson(json.getAsJsonObject(), 1);
+	private static List<Position> generateRandomCrystals(int width, int height) {
+		List<Position> crystals = new ArrayList<>();
+		crystals.add(new Position(width / 2, height / 2));
+		Random random = new Random();
+		int minCrystals = 3;
+		int maxCrystals = 5;
+		int crystalsToGenerate = random.nextInt(maxCrystals - minCrystals) + minCrystals;
+		while (true) {
+			Position p = new Position(random.nextInt(width / 2), random.nextInt(height / 2));
+			if (crystals.contains(p)) {
+				continue;
+			}
+			if (p.equals(new Position(0, 0))) {
+				continue;
+			}
+			crystals.add(p);
+			crystals.add(new Position(width - p.getX() - 1, height - p.getY() - 1));
+			crystalsToGenerate--;
+			if (crystalsToGenerate == 0) {
+				break;
+			}
+		}
+		return crystals;
+	}
+	
+	public static GameField getStartPosition(Stats stats1, Stats stats2) {
+		Player player1 = new Player(1, stats1.getHealth() * Stats.HEALTH_POINTS, stats1, new Position(0, 0), stats1.getAgility(), 0, 0);
+		Player player2 = new Player(2, stats2.getHealth() * Stats.HEALTH_POINTS, stats2, new Position(8, 10), stats2.getAgility(), 0, 0);
+		return new GameField(9, 11, player1, player2, generateRandomCrystals(9, 11), new Position(0, 0), new Position(8, 10), true);
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("GameField %dx%d, player1: %s, player2: %s", width, height, player1, player2);
+		return String.format("GameField %dx%d, player1: %s, player2: %s, crystals: %s", width, height, player1, player2, crystals);
 	}
 	
 	public static void main(String[] args) {
-		GameField field = GameField.getStartPosition();
-		System.out.println(field);
-		Game game = new Game(new FeatureBasedEvaluator(1000, 100, -100), field);
-		MinimaxSolver.solveAB(game, 4);
+//		GameField field = GameField.getStartPosition();
+//		System.out.println(field);
+//		Game game = new Game(new FeatureBasedEvaluator(1000, 100, -100), field);
+//		MinimaxSolver.solveAB(game, 4);
 	}
 }
